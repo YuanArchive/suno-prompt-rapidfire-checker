@@ -32,7 +32,7 @@ body {
 
 .widget-shell {
   display: grid;
-  padding: 6px;
+  padding: 0;
   background: transparent;
 }
 
@@ -101,7 +101,7 @@ body {
 
 @media (max-width: 520px) {
   .widget-shell {
-    padding: 6px;
+    padding: 0;
   }
 
   .launch-card {
