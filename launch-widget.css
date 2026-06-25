@@ -1,5 +1,4 @@
 :root {
-  color-scheme: light;
   --ink: #111111;
   --muted: #4a4a4a;
   --paper: #ffffff;
@@ -14,8 +13,11 @@
 html,
 body {
   min-width: 320px;
-  min-height: 100%;
+  min-height: 0;
+  height: auto;
   margin: 0;
+  overflow: hidden;
+  background: transparent;
 }
 
 body {
