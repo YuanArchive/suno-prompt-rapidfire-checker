@@ -4,6 +4,7 @@ import {
   buildCopySummary,
   escapeHtml,
   highlightPrompt,
+  rewritePrompt,
 } from './rules.js';
 
 const SAMPLE_PROMPT = `[Genre]
@@ -27,9 +28,11 @@ const matchCount = document.querySelector('#matchCount');
 const detectedList = document.querySelector('#detectedList');
 const suggestionList = document.querySelector('#suggestionList');
 const highlightPreview = document.querySelector('#highlightPreview');
+const rewrittenPrompt = document.querySelector('#rewrittenPrompt');
 const sampleButton = document.querySelector('#sampleButton');
 const clearButton = document.querySelector('#clearButton');
 const copyButton = document.querySelector('#copyButton');
+const copyRewriteButton = document.querySelector('#copyRewriteButton');
 
 promptInput.addEventListener('input', render);
 sampleButton.addEventListener('click', () => {
@@ -45,6 +48,7 @@ clearButton.addEventListener('click', () => {
   render();
 });
 copyButton.addEventListener('click', copySummary);
+copyRewriteButton.addEventListener('click', copyRewrite);
 
 render();
 
@@ -62,6 +66,7 @@ function render() {
   highlightPreview.innerHTML = prompt
     ? highlightPrompt(prompt, analysis)
     : '프롬프트를 붙여넣으면 감지된 위험 단어가 여기에 표시됩니다.';
+  renderRewrite(prompt, analysis);
 }
 
 function renderDetectedList(analysis) {
@@ -130,6 +135,37 @@ async function copySummary() {
     copyButton.textContent = '복사 실패';
     window.setTimeout(() => {
       copyButton.textContent = '힌트 복사';
+    }, 1200);
+  }
+}
+
+function renderRewrite(prompt, analysis) {
+  const hasRewrite = Boolean(prompt && analysis.matches.length);
+
+  rewrittenPrompt.textContent = hasRewrite
+    ? rewritePrompt(analysis)
+    : '위험 단어가 감지되면 대체 표현으로 바꾼 수정본이 여기에 표시됩니다.';
+  copyRewriteButton.disabled = !hasRewrite;
+
+  if (!hasRewrite) {
+    copyRewriteButton.textContent = '수정본 복사';
+  }
+}
+
+async function copyRewrite() {
+  const analysis = analyzePrompt(promptInput.value);
+  const rewritten = rewritePrompt(analysis);
+
+  try {
+    await navigator.clipboard.writeText(rewritten);
+    copyRewriteButton.textContent = '복사됨';
+    window.setTimeout(() => {
+      copyRewriteButton.textContent = '수정본 복사';
+    }, 1200);
+  } catch {
+    copyRewriteButton.textContent = '복사 실패';
+    window.setTimeout(() => {
+      copyRewriteButton.textContent = '수정본 복사';
     }, 1200);
   }
 }

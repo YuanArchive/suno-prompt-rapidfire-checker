@@ -6,6 +6,7 @@ import {
   buildCopySummary,
   escapeHtml,
   highlightPrompt,
+  rewritePrompt,
 } from './rules.js';
 
 test('detects risky Suno prompt terms case-insensitively', () => {
@@ -69,4 +70,31 @@ test('builds a Korean copy summary for detected risk terms', () => {
   const clean = buildCopySummary(analyzePrompt('warm acoustic pop with steady drums'));
 
   assert.match(clean, /감지된 위험 단어가 없습니다/);
+});
+
+test('rewrites risky terms with the first replacement suggestion', () => {
+  const analysis = analyzePrompt('Bright FUTURE BASS with vocal chops and glitch_hop.');
+  const rewritten = rewritePrompt(analysis);
+
+  assert.equal(
+    rewritten,
+    'Bright electronic pop with smooth backing vocal texture and crisp electronic groove.',
+  );
+});
+
+test('rewrites overlapping terms without replacing inside unrelated words', () => {
+  const analysis = analyzePrompt('Use vocal chops, not chopsticks, then add chop.');
+  const rewritten = rewritePrompt(analysis);
+
+  assert.equal(
+    rewritten,
+    'Use smooth backing vocal texture, not chopsticks, then add smooth transition.',
+  );
+});
+
+test('collapses repeated words created by replacement boundaries', () => {
+  const analysis = analyzePrompt('Bright future bass with a clean chorus.');
+  const rewritten = rewritePrompt(analysis);
+
+  assert.equal(rewritten, 'Bright electronic pop with a clean chorus.');
 });

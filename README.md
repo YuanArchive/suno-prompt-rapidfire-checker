@@ -1,6 +1,6 @@
 # Suno Prompt Rapidfire Checker
 
-A tiny static checker for spotting Suno prompt terms that may increase the chance of unwanted vocal chops, rhythm slicing, stutter edits, or rapid "따발총" patterns.
+A tiny static checker for spotting Suno prompt terms that may increase the chance of unwanted vocal chops, rhythm slicing, stutter edits, or rapid chopped patterns. Risky terms and replacement suggestions live in `rules.js`, so the checker UI updates as the list grows.
 
 Open `index.html` through any static server. The checker runs entirely in the browser and does not send prompts anywhere.
 

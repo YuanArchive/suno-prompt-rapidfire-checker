@@ -17,7 +17,7 @@ export const RISK_LEVELS = {
   'very-high': {
     label: '매우 높음',
     rank: 3,
-    tone: '따발총처럼 잘게 튀는 패턴이 나올 확률을 크게 올릴 수 있습니다.',
+    tone: '잘게 튀는 보컬찹이나 리듬 슬라이스 패턴이 나올 확률을 크게 올릴 수 있습니다.',
   },
 };
 
@@ -139,7 +139,7 @@ export const RISK_RULES = Object.freeze([
     level: 'very-high',
     category: '편집·효과',
     pattern: '보컬찹 / 리듬 슬라이스',
-    reason: '보컬을 슬라이스하라는 말이라 따발총 패턴과 가까워집니다.',
+    reason: '보컬을 슬라이스하라는 말이라 잘게 튀는 패턴과 가까워집니다.',
     suggestion: 'gentle vocal texture, wide harmony layer',
   },
   {
@@ -171,7 +171,7 @@ export const RISK_RULES = Object.freeze([
     level: 'very-high',
     category: '편집·효과',
     pattern: '초고속 반복',
-    reason: '매우 짧은 박자 단위라 따발총처럼 들릴 확률이 커집니다.',
+    reason: '매우 짧은 박자 단위라 잘게 튀는 리듬으로 들릴 확률이 커집니다.',
     suggestion: 'steady eighth-note pulse, moderate rhythmic motion',
   },
   {
@@ -335,6 +335,28 @@ export function highlightPrompt(prompt, analysis = analyzePrompt(prompt)) {
   return html;
 }
 
+export function rewritePrompt(analysisOrPrompt) {
+  const analysis =
+    typeof analysisOrPrompt === 'string' ? analyzePrompt(analysisOrPrompt) : analysisOrPrompt;
+  const text = String(analysis?.text ?? '');
+
+  if (!text || !analysis?.matches?.length) {
+    return text;
+  }
+
+  let cursor = 0;
+  let rewritten = '';
+
+  for (const match of analysis.matches) {
+    rewritten = appendWithoutRepeatedBoundary(rewritten, text.slice(cursor, match.start));
+    rewritten = appendWithoutRepeatedBoundary(rewritten, getPrimarySuggestion(match));
+    cursor = match.end;
+  }
+
+  rewritten = appendWithoutRepeatedBoundary(rewritten, text.slice(cursor));
+  return rewritten;
+}
+
 export function buildCopySummary(analysis) {
   if (!analysis.matches.length) {
     return [
@@ -355,7 +377,11 @@ export function buildCopySummary(analysis) {
     lines.push(`- ${match.canonical}: ${match.suggestion}`);
   }
 
-  lines.push('', '주의: 무조건 나오는 것은 아니고, 해당 패턴이 나올 확률이 높아지는 쪽으로 봐주세요.');
+  lines.push(
+    '',
+    '주의: 무조건 나오는 것은 아니고, 해당 패턴이 나올 확률이 높아지는 쪽으로 봐주세요.',
+    '대체 단어로 치환되더라도 해당 패턴이 완전히 사라지는 것은 아닙니다.',
+  );
   return lines.join('\n');
 }
 
@@ -442,4 +468,35 @@ function dedupeMatches(matches) {
   }
 
   return unique;
+}
+
+function getPrimarySuggestion(match) {
+  return String(match.suggestion ?? match.term)
+    .split(',')
+    .map((suggestion) => suggestion.trim())
+    .find(Boolean) ?? match.term;
+}
+
+function appendWithoutRepeatedBoundary(base, addition) {
+  if (!base || !addition) {
+    return base + addition;
+  }
+
+  const lastWord = base.match(/([\p{L}\p{N}_]+)(\s*)$/u);
+  const firstWord = addition.match(/^(\s*)([\p{L}\p{N}_]+)/u);
+
+  if (!lastWord || !firstWord) {
+    return base + addition;
+  }
+
+  const previous = lastWord[1].toLocaleLowerCase('en-US');
+  const next = firstWord[2].toLocaleLowerCase('en-US');
+
+  if (previous !== next) {
+    return base + addition;
+  }
+
+  const rest = addition.slice(firstWord[0].length).replace(/^\s+/, '');
+  const separator = /\s$/.test(base) || !rest ? '' : ' ';
+  return `${base}${separator}${rest}`;
 }
