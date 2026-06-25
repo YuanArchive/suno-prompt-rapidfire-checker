@@ -90,8 +90,7 @@ body {
 
 .kicker,
 .subline,
-.title,
-.action {
+.title {
   position: relative;
   z-index: 1;
 }
@@ -117,22 +116,6 @@ body {
   font-size: clamp(0.9rem, 2.2vw, 1.08rem);
   font-weight: 700;
   line-height: 1.45;
-}
-
-.action {
-  width: fit-content;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-  border: 1px solid rgba(255, 248, 236, 0.35);
-  border-radius: 8px;
-  padding: 0 18px;
-  color: #071018;
-  background: var(--butter);
-  font-size: 0.98rem;
-  font-weight: 950;
 }
 
 .launch-card:focus-visible {
