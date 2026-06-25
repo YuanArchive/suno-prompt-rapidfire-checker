@@ -26,26 +26,39 @@
       </section>
 
       <section class="workspace" aria-label="프롬프트 검사 도구">
-        <div class="input-panel">
-          <div class="panel-title-row">
-            <div>
-              <p class="panel-kicker">Paste Prompt</p>
-              <h2>검사할 프롬프트</h2>
+        <div class="tool-column">
+          <div class="input-panel">
+            <div class="panel-title-row">
+              <div>
+                <p class="panel-kicker">Paste Prompt</p>
+                <h2>검사할 프롬프트</h2>
+              </div>
+              <span id="characterCount" class="count-pill">0자</span>
             </div>
-            <span id="characterCount" class="count-pill">0자</span>
+
+            <textarea
+              id="promptInput"
+              spellcheck="false"
+              placeholder="[Genre]&#10;Bright hopeful J-pop, acoustic pop rock...&#10;&#10;[Vocal]&#10;Clear expressive vocal, no vocal chops..."
+            ></textarea>
+
+            <div class="button-row">
+              <button id="sampleButton" class="ghost-button" type="button">예시 넣기</button>
+              <button id="clearButton" class="ghost-button" type="button">초기화</button>
+              <button id="copyButton" class="primary-button" type="button">힌트 복사</button>
+            </div>
           </div>
 
-          <textarea
-            id="promptInput"
-            spellcheck="false"
-            placeholder="[Genre]&#10;Bright hopeful J-pop, acoustic pop rock...&#10;&#10;[Vocal]&#10;Clear expressive vocal, no vocal chops..."
-          ></textarea>
-
-          <div class="button-row">
-            <button id="sampleButton" class="ghost-button" type="button">예시 넣기</button>
-            <button id="clearButton" class="ghost-button" type="button">초기화</button>
-            <button id="copyButton" class="primary-button" type="button">힌트 복사</button>
-          </div>
+          <section class="preview-panel" aria-labelledby="preview-title">
+            <div class="panel-title-row">
+              <div>
+                <p class="panel-kicker">Preview</p>
+                <h2 id="preview-title">위험 단어 하이라이트</h2>
+              </div>
+              <span class="note-pill">무조건 발생 아님, 확률 체크용</span>
+            </div>
+            <pre id="highlightPreview" class="highlight-preview"></pre>
+          </section>
         </div>
 
         <aside class="result-panel" aria-live="polite">
@@ -68,17 +81,6 @@
             <div id="suggestionList" class="suggestion-list"></div>
           </div>
         </aside>
-      </section>
-
-      <section class="preview-panel" aria-labelledby="preview-title">
-        <div class="panel-title-row">
-          <div>
-            <p class="panel-kicker">Preview</p>
-            <h2 id="preview-title">위험 단어 하이라이트</h2>
-          </div>
-          <span class="note-pill">무조건 발생 아님, 확률 체크용</span>
-        </div>
-        <pre id="highlightPreview" class="highlight-preview"></pre>
       </section>
     </main>
 
