@@ -71,6 +71,30 @@ export const RISK_RULES = Object.freeze([
     suggestion: 'crisp electronic pop, clean digital synth texture',
   },
   {
+    term: 'glitch_hop',
+    level: 'very-high',
+    category: '장르명',
+    pattern: '글리치 / 리듬 슬라이스',
+    reason: '글리치 리듬과 잘게 잘린 샘플 문법을 강하게 부를 수 있습니다.',
+    suggestion: 'crisp electronic groove, clean syncopated pop texture',
+  },
+  {
+    term: 'glitch-hop',
+    level: 'very-high',
+    category: '장르명',
+    pattern: '글리치 / 리듬 슬라이스',
+    reason: '글리치 리듬과 잘게 잘린 샘플 문법을 강하게 부를 수 있습니다.',
+    suggestion: 'crisp electronic groove, clean syncopated pop texture',
+  },
+  {
+    term: 'glitch hop',
+    level: 'very-high',
+    category: '장르명',
+    pattern: '글리치 / 리듬 슬라이스',
+    reason: '글리치 리듬과 잘게 잘린 샘플 문법을 강하게 부를 수 있습니다.',
+    suggestion: 'crisp electronic groove, clean syncopated pop texture',
+  },
+  {
     term: 'hyperpop',
     level: 'very-high',
     category: '장르명',
@@ -419,4 +443,3 @@ function dedupeMatches(matches) {
 
   return unique;
 }
-

@@ -20,6 +20,17 @@ test('detects risky Suno prompt terms case-insensitively', () => {
   assert.equal(result.matches[1].pattern, '보컬찹 / 리듬 슬라이스');
 });
 
+test('detects glitch hop spelling variants as severe rhythm slicing triggers', () => {
+  const result = analyzePrompt('Try glitch_hop, glitch-hop, and GLITCH HOP energy.');
+
+  assert.equal(result.severity, 'very-high');
+  assert.deepEqual(
+    result.matches.map((match) => match.canonical),
+    ['glitch_hop', 'glitch-hop', 'glitch hop'],
+  );
+  assert.ok(result.matches.every((match) => match.pattern === '글리치 / 리듬 슬라이스'));
+});
+
 test('prefers longer overlapping terms over shorter partial matches', () => {
   const result = analyzePrompt('Add sliced vocal, vocal chop, and vocal chops.');
 
@@ -59,4 +70,3 @@ test('builds a Korean copy summary for detected risk terms', () => {
 
   assert.match(clean, /감지된 위험 단어가 없습니다/);
 });
-
