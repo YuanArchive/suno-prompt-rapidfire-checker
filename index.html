@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>프롬프트 따발총 유발 검사기</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23171717'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%239ed8c2'/%3E%3Cpath d='M24 32h16M32 24v16' stroke='%23171717' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="tool-head" aria-labelledby="page-title">
+        <p class="eyebrow">Suno Prompt Check</p>
+        <h1 id="page-title">프롬프트 따발총 유발 검사기</h1>
+        <p class="lead">
+          프롬프트를 붙여넣으면 보컬찹, 리듬 슬라이스, 과한 글리치 패턴을 부를 수 있는 단어를 표시합니다.
+        </p>
+      </section>
+
+      <section class="workspace" aria-label="프롬프트 검사 도구">
+        <div class="input-panel">
+          <div class="panel-title-row">
+            <div>
+              <p class="panel-kicker">Paste Prompt</p>
+              <h2>검사할 프롬프트</h2>
+            </div>
+            <span id="characterCount" class="count-pill">0자</span>
+          </div>
+
+          <textarea
+            id="promptInput"
+            spellcheck="false"
+            placeholder="[Genre]&#10;Bright hopeful J-pop, acoustic pop rock...&#10;&#10;[Vocal]&#10;Clear expressive vocal, no vocal chops..."
+          ></textarea>
+
+          <div class="button-row">
+            <button id="sampleButton" class="ghost-button" type="button">예시 넣기</button>
+            <button id="clearButton" class="ghost-button" type="button">초기화</button>
+            <button id="copyButton" class="primary-button" type="button">힌트 복사</button>
+          </div>
+        </div>
+
+        <aside class="result-panel" aria-live="polite">
+          <div id="riskCard" class="risk-card clean">
+            <p class="panel-kicker">Risk Level</p>
+            <strong id="riskLabel">깔끔함</strong>
+            <span id="riskTone">현재 목록 기준으로는 위험 단어가 감지되지 않았습니다.</span>
+          </div>
+
+          <div class="result-section">
+            <div class="panel-title-row compact">
+              <h2>감지된 단어</h2>
+              <span id="matchCount" class="count-pill">0개</span>
+            </div>
+            <div id="detectedList" class="detected-list"></div>
+          </div>
+
+          <div class="result-section">
+            <h2>바꿔쓰기 힌트</h2>
+            <div id="suggestionList" class="suggestion-list"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="preview-panel" aria-labelledby="preview-title">
+        <div class="panel-title-row">
+          <div>
+            <p class="panel-kicker">Preview</p>
+            <h2 id="preview-title">위험 단어 하이라이트</h2>
+          </div>
+          <span class="note-pill">무조건 발생 아님, 확률 체크용</span>
+        </div>
+        <pre id="highlightPreview" class="highlight-preview"></pre>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
