@@ -1,16 +1,10 @@
 :root {
-  color-scheme: dark;
-  --ink: #fff8ec;
-  --muted: #d8cfc5;
-  --obsidian: #070d16;
-  --panel: #101927;
-  --panel-deep: #0b111d;
-  --line: rgba(255, 248, 236, 0.16);
-  --coral: #ff7e8a;
-  --coral-deep: #e85f72;
-  --butter: #f4dc8a;
-  --mint: #9ee6d0;
-  --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  color-scheme: light;
+  --ink: #111111;
+  --muted: #4a4a4a;
+  --paper: #ffffff;
+  --paper-hover: #f5f5f5;
+  --line: #111111;
 }
 
 * {
@@ -32,7 +26,7 @@ body {
     BlinkMacSystemFont,
     system-ui,
     sans-serif;
-  background: var(--obsidian);
+  background: transparent;
   letter-spacing: 0;
 }
 
@@ -41,51 +35,22 @@ body {
   display: grid;
   place-items: stretch;
   padding: 10px;
-  background:
-    linear-gradient(135deg, rgba(158, 230, 208, 0.18), transparent 34%),
-    linear-gradient(315deg, rgba(255, 126, 138, 0.2), transparent 38%),
-    var(--obsidian);
+  background: transparent;
 }
 
 .launch-card {
-  min-height: 158px;
+  min-height: 128px;
   display: grid;
   align-content: center;
-  gap: 8px;
+  gap: 7px;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 126, 138, 0.42);
+  border: 2px solid var(--line);
   border-radius: 8px;
-  padding: 22px 24px;
+  padding: 22px 26px;
   color: var(--ink);
-  background:
-    linear-gradient(135deg, rgba(255, 126, 138, 0.95), rgba(232, 95, 114, 0.8) 42%, rgba(16, 25, 39, 0.94) 43%),
-    var(--panel);
-  box-shadow: var(--shadow);
+  background: var(--paper);
   text-decoration: none;
-}
-
-.launch-card::before {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(255, 248, 236, 0.22);
-  border-radius: 6px;
-  pointer-events: none;
-}
-
-.launch-card::after {
-  content: "";
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 48px;
-  aspect-ratio: 1;
-  border: 12px solid rgba(244, 220, 138, 0.72);
-  border-left-color: transparent;
-  border-bottom-color: transparent;
-  transform: rotate(45deg);
-  pointer-events: none;
 }
 
 .kicker,
@@ -96,7 +61,7 @@ body {
 }
 
 .kicker {
-  color: #251016;
+  color: var(--ink);
   font-size: 0.82rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -119,21 +84,19 @@ body {
 }
 
 .launch-card:focus-visible {
-  outline: 3px solid rgba(158, 230, 208, 0.72);
-  outline-offset: -3px;
+  outline: 3px solid var(--line);
+  outline-offset: 3px;
 }
 
 @media (hover: hover) {
   .launch-card {
     transition:
-      border-color 160ms ease,
-      transform 160ms ease,
-      filter 160ms ease;
+      background-color 160ms ease,
+      transform 160ms ease;
   }
 
   .launch-card:hover {
-    border-color: rgba(244, 220, 138, 0.72);
-    filter: saturate(1.06);
+    background: var(--paper-hover);
     transform: translateY(-1px);
   }
 }
@@ -144,12 +107,7 @@ body {
   }
 
   .launch-card {
-    min-height: 148px;
+    min-height: 118px;
     padding: 18px 18px;
-  }
-
-  .launch-card::after {
-    width: 36px;
-    border-width: 9px;
   }
 }
