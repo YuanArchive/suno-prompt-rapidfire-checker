@@ -42,13 +42,15 @@ button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);col
 #rewrite{border-color:transparent;transition:border-color .2s,box-shadow .2s}
 #rewrite.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.18)}
 .ph{color:var(--muted)}
+.effect{padding:13px 0;border-bottom:1px solid var(--border)}
+.effect:first-child{padding-top:0}
+.effect:last-child{border:none;padding-bottom:0}
+.effect-head{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.effect-head .cnt{color:var(--accent-2);font-weight:700;font-size:13px}
+.effect-note{color:var(--muted);font-size:13px;margin-top:6px;padding-left:12px;border-left:2px solid var(--border);line-height:1.6}
 mark.hit{border-radius:4px;padding:1px 3px;color:#fff;cursor:help}
 mark.high{background:rgba(224,86,111,.32);box-shadow:inset 0 -2px 0 var(--crit)}
 mark.med{background:rgba(226,179,65,.26);box-shadow:inset 0 -2px 0 var(--warn)}
-.lvl{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.badge{font-weight:700;padding:4px 12px;border-radius:99px;font-size:13px}
-.meter{height:10px;border-radius:99px;background:var(--panel-2);overflow:hidden;border:1px solid var(--border)}
-.meter>i{display:block;height:100%;width:8%;border-radius:99px;transition:.3s}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{background:var(--panel-2);border:1px solid var(--border);border-radius:99px;padding:5px 12px;font-size:12px}
 .hint{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
@@ -68,7 +70,7 @@ mark.med{background:rgba(226,179,65,.26);box-shadow:inset 0 -2px 0 var(--warn)}
 <div class="wrap">
   <header>
     <h1><span class="accent">프롬프트 검사기</span></h1>
-    <p>프롬프트를 붙여넣으면 보컬찹·리듬 슬라이스·과한 글리치, 라이브 군중감을 부를 수 있는 단어를 실시간으로 표시하고, 안전한 대체 표현으로 바꿔줍니다.</p>
+    <p>프롬프트를 붙여넣으면 보컬찹·리듬 슬라이스·과한 글리치, 라이브 군중감 같은 연출을 부를 수 있는 단어를 실시간으로 찾아 분류해 알려주고, 안전한 대체 표현으로 바꿔줍니다.</p>
   </header>
 
   <section class="card">
@@ -84,19 +86,14 @@ mark.med{background:rgba(226,179,65,.26);box-shadow:inset 0 -2px 0 var(--warn)}
   </section>
 
   <section class="card">
-    <h2>위험도</h2>
-    <div class="lvl">
-      <span class="badge" id="lvlbadge">깔끔함</span>
-      <span class="count" id="detcount">감지 0개</span>
-    </div>
-    <div class="meter"><i id="meterfill"></i></div>
-    <p class="count" id="lvldesc" aria-live="polite" style="margin:14px 0 0">현재 목록 기준 위험 단어가 감지되지 않았습니다.</p>
+    <h2>예상되는 연출</h2>
+    <div id="effects"><span class="ph">프롬프트를 넣으면 어떤 연출이 생길 수 있는지 알려드려요.</span></div>
   </section>
 
   <section class="card">
     <h2>위험 단어 하이라이트 · <span style="text-transform:none;font-weight:400">무조건 발생 아님, 확률 체크용</span></h2>
     <div class="preview" id="preview"><span class="ph">검사할 프롬프트가 비어 있습니다.</span></div>
-    <div class="row"><span class="spacer"></span><span class="count">위험 단어에 마우스를 올리면 대체어가 보여요</span></div>
+    <div class="row"><span class="spacer"></span><span class="count">표시된 단어에 마우스를 올리면 대체어가 보여요</span></div>
   </section>
 
   <section class="card">
@@ -120,98 +117,107 @@ mark.med{background:rgba(226,179,65,.26);box-shadow:inset 0 -2px 0 var(--warn)}
 
 <script>
 const DICT = [
-  {w:"kawaii future bass", s:"playful bright synth colors", lv:"high"},
-  {w:"melodic dubstep", s:"melodic electronic atmosphere", lv:"high"},
-  {w:"bubblegum bass", s:"playful bright synth colors", lv:"high"},
-  {w:"future bounce", s:"bright electronic pop texture", lv:"high"},
-  {w:"future bass", s:"bright electronic pop texture", lv:"high"},
-  {w:"hyperpop", s:"colorful modern pop energy", lv:"high"},
-  {w:"glitchcore", s:"crisp modern synth texture", lv:"high"},
-  {w:"glitch pop", s:"clean digital pop texture", lv:"high"},
-  {w:"glitch hop", s:"crisp electronic groove", lv:"high"},
-  {w:"glitch-hop", s:"crisp electronic groove", lv:"high"},
-  {w:"glitch_hop", s:"crisp electronic groove", lv:"high"},
-  {w:"nightcore", s:"bright fast pop energy", lv:"high"},
-  {w:"bitcrushed", s:"clean digital texture", lv:"med"},
-  {w:"chopped vocal", s:"natural continuous vocal line", lv:"high"},
-  {w:"sliced vocal", s:"natural continuous vocal line", lv:"high"},
-  {w:"glitched vocal", s:"clean lead vocal", lv:"high"},
-  {w:"glitch vocal", s:"clean lead vocal", lv:"high"},
-  {w:"pitched vocal", s:"natural-pitch vocal", lv:"high"},
-  {w:"high-pitched vocal", s:"natural-range vocal", lv:"med"},
-  {w:"granular vocal", s:"smooth vocal", lv:"med"},
-  {w:"formant-shifted vocal", s:"natural vocal", lv:"med"},
-  {w:"sampled vocal", s:"lead vocal melody", lv:"med"},
-  {w:"chiptune vocal", s:"clean synth lead", lv:"med"},
-  {w:"vocal chops", s:"sung melodic hook", lv:"high"},
-  {w:"vocal chop", s:"sung melodic hook", lv:"high"},
-  {w:"vocal sample", s:"lead vocal melody", lv:"high"},
-  {w:"vocal loop", s:"lead vocal melody", lv:"high"},
-  {w:"vocal drop", s:"sung chorus", lv:"high"},
-  {w:"beat slicing", s:"tight rhythmic groove", lv:"high"},
-  {w:"stutter edits", s:"smooth phrasing", lv:"high"},
-  {w:"rapid-fire edits", s:"smooth phrasing", lv:"med"},
-  {w:"machine-gun edits", s:"smooth phrasing", lv:"med"},
-  {w:"rapid edits", s:"smooth phrasing", lv:"med"},
-  {w:"micro edits", s:"smooth phrasing", lv:"med"},
-  {w:"cut-up", s:"continuous arrangement", lv:"med"},
-  {w:"drop-focused", s:"chorus-focused song structure", lv:"high"},
-  {w:"big drop", s:"sung chorus payoff", lv:"high"},
-  {w:"EDM drop", s:"melodic chorus", lv:"high"},
-  {w:"1/16", s:"steady rhythm", lv:"med"},
-  {w:"1/32", s:"steady rhythm", lv:"med"},
-  {w:"uplifting anthem", s:"bright hopeful J-pop", lv:"high"},
-  {w:"crowd vocals", s:"personal vocal-focused", lv:"high"},
-  {w:"crowd cheering", s:"studio performance", lv:"high"},
-  {w:"crowd clapping", s:"studio performance", lv:"high"},
-  {w:"crowd chant", s:"studio performance", lv:"high"},
-  {w:"audience cheering", s:"studio performance", lv:"high"},
-  {w:"gang vocals", s:"single lead vocal", lv:"high"},
-  {w:"pub singalong", s:"lead vocal melody", lv:"high"},
-  {w:"sing-along", s:"lead vocal melody", lv:"med"},
-  {w:"singalong", s:"lead vocal melody", lv:"med"},
-  {w:"live concert", s:"studio recording", lv:"high"},
-  {w:"live energy", s:"lively studio performance", lv:"med"},
-  {w:"arena reverb", s:"dry studio reverb", lv:"high"},
-  {w:"arena", s:"studio", lv:"med"},
-  {w:"stadium", s:"studio", lv:"med"},
-  {w:"audience", s:"studio", lv:"med"},
-  {w:"crowd", s:"studio", lv:"med"},
-  {w:"festival anthem", s:"adventurous folk color", lv:"high"},
-  {w:"festival", s:"adventurous folk color", lv:"med"},
-  {w:"anthemic", s:"melodic and uplifting", lv:"med"},
-  {w:"anthem", s:"melodic uplifting song", lv:"med"},
-  {w:"celebratory", s:"warm uplifting", lv:"med"},
-  {w:"triumphant", s:"confident", lv:"med"},
-  {w:"euphoric", s:"bright and hopeful", lv:"med"},
-  {w:"communal", s:"personal, vocal-focused", lv:"med"},
-  {w:"massive final chorus", s:"brighter final chorus", lv:"high"},
-  {w:"big final chorus", s:"brighter final chorus", lv:"med"},
-  {w:"massive chorus", s:"lifted melodic chorus", lv:"med"},
-  {w:"huge chorus", s:"lifted melodic chorus", lv:"med"},
-  {w:"soaring chorus", s:"lifted melodic chorus", lv:"med"},
-  {w:"explosive chorus", s:"strong studio chorus", lv:"high"},
-  {w:"wall of sound chorus", s:"clean separated chorus", lv:"high"},
-  {w:"wall of sound", s:"clean separated arrangement", lv:"med"},
-  {w:"emotional climax", s:"controlled emotional lift", lv:"med"},
-  {w:"bigger emotional lift", s:"controlled emotional lift", lv:"med"},
-  {w:"dopamine rush", s:"sparkling excitement", lv:"med"},
-  {w:"heart-racing", s:"nervous excitement", lv:"med"},
-  {w:"Celtic J-pop", s:"J-pop with Celtic fiddle motif", lv:"high"},
-  {w:"Irish folk energy", s:"dry Irish fiddle-style melody", lv:"med"},
-  {w:"traditional Irish folk", s:"dry Irish fiddle motif", lv:"med"},
-  {w:"folk festival", s:"adventurous folk color", lv:"med"},
-  {w:"Irish pub", s:"dry fiddle motif", lv:"med"}
+  {w:"kawaii future bass", s:"playful bright synth colors", lv:"high", cat:"glitch"},
+  {w:"melodic dubstep", s:"melodic electronic atmosphere", lv:"high", cat:"glitch"},
+  {w:"bubblegum bass", s:"playful bright synth colors", lv:"high", cat:"glitch"},
+  {w:"future bounce", s:"bright electronic pop texture", lv:"high", cat:"glitch"},
+  {w:"future bass", s:"bright electronic pop texture", lv:"high", cat:"glitch"},
+  {w:"hyperpop", s:"colorful modern pop energy", lv:"high", cat:"glitch"},
+  {w:"glitchcore", s:"crisp modern synth texture", lv:"high", cat:"glitch"},
+  {w:"glitch pop", s:"clean digital pop texture", lv:"high", cat:"glitch"},
+  {w:"glitch hop", s:"crisp electronic groove", lv:"high", cat:"glitch"},
+  {w:"glitch-hop", s:"crisp electronic groove", lv:"high", cat:"glitch"},
+  {w:"glitch_hop", s:"crisp electronic groove", lv:"high", cat:"glitch"},
+  {w:"nightcore", s:"bright fast pop energy", lv:"high", cat:"glitch"},
+  {w:"bitcrushed", s:"clean digital texture", lv:"med", cat:"glitch"},
+  {w:"chopped vocal", s:"natural continuous vocal line", lv:"high", cat:"vocalchop"},
+  {w:"sliced vocal", s:"natural continuous vocal line", lv:"high", cat:"vocalchop"},
+  {w:"glitched vocal", s:"clean lead vocal", lv:"high", cat:"vocalchop"},
+  {w:"glitch vocal", s:"clean lead vocal", lv:"high", cat:"vocalchop"},
+  {w:"pitched vocal", s:"natural-pitch vocal", lv:"high", cat:"vocalchop"},
+  {w:"high-pitched vocal", s:"natural-range vocal", lv:"med", cat:"vocalchop"},
+  {w:"granular vocal", s:"smooth vocal", lv:"med", cat:"vocalchop"},
+  {w:"formant-shifted vocal", s:"natural vocal", lv:"med", cat:"vocalchop"},
+  {w:"sampled vocal", s:"lead vocal melody", lv:"med", cat:"vocalchop"},
+  {w:"chiptune vocal", s:"clean synth lead", lv:"med", cat:"vocalchop"},
+  {w:"vocal chops", s:"sung melodic hook", lv:"high", cat:"vocalchop"},
+  {w:"vocal chop", s:"sung melodic hook", lv:"high", cat:"vocalchop"},
+  {w:"vocal sample", s:"lead vocal melody", lv:"high", cat:"vocalchop"},
+  {w:"vocal loop", s:"lead vocal melody", lv:"high", cat:"vocalchop"},
+  {w:"vocal drop", s:"sung chorus", lv:"high", cat:"vocalchop"},
+  {w:"beat slicing", s:"tight rhythmic groove", lv:"high", cat:"rhythm"},
+  {w:"stutter edits", s:"smooth phrasing", lv:"high", cat:"rhythm"},
+  {w:"rapid-fire edits", s:"smooth phrasing", lv:"med", cat:"rhythm"},
+  {w:"machine-gun edits", s:"smooth phrasing", lv:"med", cat:"rhythm"},
+  {w:"rapid edits", s:"smooth phrasing", lv:"med", cat:"rhythm"},
+  {w:"micro edits", s:"smooth phrasing", lv:"med", cat:"rhythm"},
+  {w:"cut-up", s:"continuous arrangement", lv:"med", cat:"rhythm"},
+  {w:"drop-focused", s:"chorus-focused song structure", lv:"high", cat:"drop"},
+  {w:"big drop", s:"sung chorus payoff", lv:"high", cat:"drop"},
+  {w:"EDM drop", s:"melodic chorus", lv:"high", cat:"drop"},
+  {w:"1/16", s:"steady rhythm", lv:"med", cat:"rhythm"},
+  {w:"1/32", s:"steady rhythm", lv:"med", cat:"rhythm"},
+  {w:"uplifting anthem", s:"bright hopeful J-pop", lv:"high", cat:"hype"},
+  {w:"crowd vocals", s:"personal vocal-focused", lv:"high", cat:"crowd"},
+  {w:"crowd cheering", s:"studio performance", lv:"high", cat:"crowd"},
+  {w:"crowd clapping", s:"studio performance", lv:"high", cat:"crowd"},
+  {w:"crowd chant", s:"studio performance", lv:"high", cat:"crowd"},
+  {w:"audience cheering", s:"studio performance", lv:"high", cat:"crowd"},
+  {w:"gang vocals", s:"single lead vocal", lv:"high", cat:"crowd"},
+  {w:"pub singalong", s:"lead vocal melody", lv:"high", cat:"crowd"},
+  {w:"sing-along", s:"lead vocal melody", lv:"med", cat:"crowd"},
+  {w:"singalong", s:"lead vocal melody", lv:"med", cat:"crowd"},
+  {w:"live concert", s:"studio recording", lv:"high", cat:"crowd"},
+  {w:"live energy", s:"lively studio performance", lv:"med", cat:"crowd"},
+  {w:"arena reverb", s:"dry studio reverb", lv:"high", cat:"crowd"},
+  {w:"arena", s:"studio", lv:"med", cat:"crowd"},
+  {w:"stadium", s:"studio", lv:"med", cat:"crowd"},
+  {w:"audience", s:"studio", lv:"med", cat:"crowd"},
+  {w:"crowd", s:"studio", lv:"med", cat:"crowd"},
+  {w:"festival anthem", s:"adventurous folk color", lv:"high", cat:"crowd"},
+  {w:"festival", s:"adventurous folk color", lv:"med", cat:"crowd"},
+  {w:"anthemic", s:"melodic and uplifting", lv:"med", cat:"hype"},
+  {w:"anthem", s:"melodic uplifting song", lv:"med", cat:"hype"},
+  {w:"celebratory", s:"warm uplifting", lv:"med", cat:"hype"},
+  {w:"triumphant", s:"confident", lv:"med", cat:"hype"},
+  {w:"euphoric", s:"bright and hopeful", lv:"med", cat:"hype"},
+  {w:"communal", s:"personal, vocal-focused", lv:"med", cat:"crowd"},
+  {w:"massive final chorus", s:"brighter final chorus", lv:"high", cat:"hype"},
+  {w:"big final chorus", s:"brighter final chorus", lv:"med", cat:"hype"},
+  {w:"massive chorus", s:"lifted melodic chorus", lv:"med", cat:"hype"},
+  {w:"huge chorus", s:"lifted melodic chorus", lv:"med", cat:"hype"},
+  {w:"soaring chorus", s:"lifted melodic chorus", lv:"med", cat:"hype"},
+  {w:"explosive chorus", s:"strong studio chorus", lv:"high", cat:"hype"},
+  {w:"wall of sound chorus", s:"clean separated chorus", lv:"high", cat:"hype"},
+  {w:"wall of sound", s:"clean separated arrangement", lv:"med", cat:"hype"},
+  {w:"emotional climax", s:"controlled emotional lift", lv:"med", cat:"hype"},
+  {w:"bigger emotional lift", s:"controlled emotional lift", lv:"med", cat:"hype"},
+  {w:"dopamine rush", s:"sparkling excitement", lv:"med", cat:"hype"},
+  {w:"heart-racing", s:"nervous excitement", lv:"med", cat:"hype"},
+  {w:"Celtic J-pop", s:"J-pop with Celtic fiddle motif", lv:"high", cat:"folk"},
+  {w:"Irish folk energy", s:"dry Irish fiddle-style melody", lv:"med", cat:"folk"},
+  {w:"traditional Irish folk", s:"dry Irish fiddle motif", lv:"med", cat:"folk"},
+  {w:"folk festival", s:"adventurous folk color", lv:"med", cat:"folk"},
+  {w:"Irish pub", s:"dry fiddle motif", lv:"med", cat:"folk"}
 ];
 
+const CATINFO = {
+  glitch:{label:"글리치·하이퍼팝 질감", note:"깨지는 듯한 디지털 글리치 이펙트나 과한 신스 톤이 생길 수 있어요."},
+  vocalchop:{label:"보컬 찹", note:"보컬을 잘게 자르거나 피치를 비트는 보컬 찹이 연출될 수 있어요."},
+  rhythm:{label:"리듬 슬라이싱", note:"인트로 등에서 잘게 끊기는 슬라이싱·스터터 패턴이 남을 수 있으니 인지하고 계세요."},
+  drop:{label:"드롭·빌드업", note:"EDM식 드롭/빌드업 구조가 강조될 수 있어요."},
+  crowd:{label:"군중·찬트·콘서트홀 함성", note:"함성·군중 효과는 곡의 음질을 심하게 떨어뜨릴 확률이 높습니다."},
+  hype:{label:"과장된 고조·웅장한 코러스", note:"톤이 갑자기 부풀거나 과장되게 고조될 수 있어요."},
+  folk:{label:"켈틱·아이리시 포크 색채", note:"켈틱/아이리시 포크 색채가 강하게 들어올 수 있어요."}
+};
+const CATORDER = ["glitch","vocalchop","rhythm","drop","crowd","hype","folk"];
+
 const EXAMPLE = "Bright hopeful J-pop, uplifting anthem, future bass with vocal chops and a big drop, festival crowd singing along, hyperpop glitch vocal, massive final chorus, arena reverb, dopamine rush";
-const colorMap = {ok:"#4ec9a5", warn:"#e2b341", danger:"#e0795a", crit:"#e0566f"};
 const SORTED = [...DICT].sort((a,b)=>b.w.length-a.w.length);
 const $ = s => document.querySelector(s);
 const input=$("#input"), countEl=$("#count"), preview=$("#preview"),
   rewriteEl=$("#rewrite"), chips=$("#chips"), chipcount=$("#chipcount"),
-  hintsEl=$("#hints"), lvlbadge=$("#lvlbadge"), lvldesc=$("#lvldesc"),
-  detcount=$("#detcount"), meterfill=$("#meterfill"), toast=$("#toast");
+  hintsEl=$("#hints"), effects=$("#effects"), toast=$("#toast");
 let lastRewrite="";
 
 const isWord = c => /[a-zA-Z0-9]/.test(c);
@@ -257,12 +263,19 @@ function rewrite(text,hits){
   return out+text.slice(pos);
 }
 
-function riskLevel(hits){
-  const score=hits.reduce((a,h)=>a+(h.item.lv==="high"?2:1),0);
-  if(score===0) return {label:"깔끔함",cls:"ok",pct:8,desc:"현재 목록 기준 위험 단어가 감지되지 않았습니다."};
-  if(score<=2) return {label:"주의",cls:"warn",pct:35,desc:"가벼운 주의. 한두 단어만 바꿔도 충분합니다."};
-  if(score<=5) return {label:"위험",cls:"danger",pct:70,desc:"위험. 강한 단어를 빼고 안전 표현으로 바꾸길 권장합니다."};
-  return {label:"매우 위험",cls:"crit",pct:100,desc:"매우 위험. 장르 단어부터 안전 표현으로 교체하세요."};
+function renderEffects(text,hits){
+  const byCat={};
+  for(const h of hits){ (byCat[h.item.cat]=byCat[h.item.cat]||[]).push(h); }
+  const rows=CATORDER.filter(c=>byCat[c]);
+  if(rows.length){
+    effects.innerHTML = rows.map(c=>{
+      const info=CATINFO[c], n=byCat[c].length;
+      return `<div class="effect"><div class="effect-head">${info.label} <span class="cnt">연출 단어 ${n}개</span></div><div class="effect-note">${info.note}</div></div>`;
+    }).join("");
+  } else {
+    effects.innerHTML = text ? "<span class='ph'>현재 목록 기준 감지된 연출 단어가 없습니다.</span>"
+      : "<span class='ph'>프롬프트를 넣으면 어떤 연출이 생길 수 있는지 알려드려요.</span>";
+  }
 }
 
 function update(){
@@ -274,17 +287,13 @@ function update(){
   rewriteEl.innerHTML = hits.length ? escapeHtml(lastRewrite).replace(/\n/g,"<br>")
     : (t ? escapeHtml(t).replace(/\n/g,"<br>") : "<span class='ph'>대체할 단어가 없습니다.</span>");
   rewriteEl.classList.toggle("active", hits.length>0);
+  renderEffects(t,hits);
   const uniq=[...new Map(hits.map(h=>[h.text.toLowerCase(),h])).values()];
-  detcount.textContent="감지 "+hits.length+"개";
   chipcount.textContent=uniq.length+"개";
   chips.innerHTML = uniq.length ? uniq.map(h=>`<span class="chip">${escapeHtml(h.text)}</span>`).join("")
     : "<span class='ph'>없음</span>";
   hintsEl.innerHTML = uniq.length ? uniq.map(h=>`<div class="hint"><span class="from">${escapeHtml(h.text)}</span><span class="arrow">→</span><span class="to">${escapeHtml(h.item.s)}</span></div>`).join("")
     : "<span class='ph'>감지된 단어가 없습니다.</span>";
-  const r=riskLevel(hits), c=colorMap[r.cls];
-  lvlbadge.textContent=r.label; lvldesc.textContent=r.desc;
-  lvlbadge.style.color=c; lvlbadge.style.background=c+"22";
-  meterfill.style.background=c; meterfill.style.width=r.pct+"%";
 }
 
 function showToast(msg){ toast.textContent=msg; toast.classList.add("show");
