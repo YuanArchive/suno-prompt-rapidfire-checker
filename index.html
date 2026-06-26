@@ -13,11 +13,10 @@
 *{box-sizing:border-box}
 body{margin:0;color:var(--text);line-height:1.55;
   font-family:Inter,Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:radial-gradient(1100px 560px at 72% -12%,#2b2356 0%,transparent 58%),var(--bg);}
+  background:var(--bg);}
 .wrap{max-width:860px;margin:0 auto;padding:42px 20px 90px}
 header h1{font-size:28px;margin:0 0 8px;letter-spacing:-.02em}
-.accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  -webkit-background-clip:text;background-clip:text;color:transparent}
+.accent{color:var(--accent-2)}
 header p{color:var(--muted);margin:0 0 26px;max-width:620px}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
   padding:18px;margin-bottom:16px}
@@ -33,12 +32,14 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 button{font:13px/1 inherit;border-radius:9px;padding:9px 14px;border:1px solid var(--border);
   background:var(--panel-2);color:var(--text);cursor:pointer;transition:.15s}
 button:hover{border-color:var(--accent);color:#fff}
-button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;
+button.primary{background:var(--accent);border:1px solid var(--accent);
   color:#fff;font-weight:600}
-button.primary:hover{box-shadow:0 6px 20px rgba(124,92,255,.38)}
+button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
 .preview{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:14px;
   min-height:54px;white-space:pre-wrap;word-break:break-word;
   font:14px/1.75 "JetBrains Mono",ui-monospace,monospace}
+#rewrite{border-color:transparent;transition:border-color .2s,box-shadow .2s}
+#rewrite.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.18)}
 .ph{color:var(--muted)}
 mark.hit{border-radius:4px;padding:1px 3px;color:#fff;cursor:help}
 mark.high{background:rgba(224,86,111,.32);box-shadow:inset 0 -2px 0 var(--crit)}
@@ -270,6 +271,7 @@ function update(){
   lastRewrite = rewrite(t,hits);
   rewriteEl.innerHTML = hits.length ? escapeHtml(lastRewrite).replace(/\n/g,"<br>")
     : (t ? escapeHtml(t).replace(/\n/g,"<br>") : "<span class='ph'>대체할 단어가 없습니다.</span>");
+  rewriteEl.classList.toggle("active", hits.length>0);
   const uniq=[...new Map(hits.map(h=>[h.text.toLowerCase(),h])).values()];
   detcount.textContent="감지 "+hits.length+"개";
   chipcount.textContent=uniq.length+"개";
