@@ -1,105 +1,304 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>프롬프트 검사기</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23171717'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%239ed8c2'/%3E%3Cpath d='M24 32h16M32 24v16' stroke='%23171717' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E"
-    />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
-    />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <section class="tool-head" aria-labelledby="page-title">
-        <p class="eyebrow">Suno Prompt Check</p>
-        <h1 id="page-title">프롬프트 검사기</h1>
-        <p class="lead">
-          프롬프트를 붙여넣으면 보컬찹, 리듬 슬라이스, 과한 글리치 패턴을 부를 수 있는 단어를 표시합니다.
-        </p>
-      </section>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프롬프트 검사기</title>
+<style>
+:root{
+  --bg:#1a1a1c; --panel:#222225; --panel-2:#2a2a2e; --border:#34343a;
+  --text:#dcddde; --muted:#8e8e96; --accent:#7c5cff; --accent-2:#a78bfa;
+  --ok:#4ec9a5; --warn:#e2b341; --danger:#e0795a; --crit:#e0566f; --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);line-height:1.55;
+  font-family:Inter,Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(1100px 560px at 72% -12%,#2b2356 0%,transparent 58%),var(--bg);}
+.wrap{max-width:860px;margin:0 auto;padding:42px 20px 90px}
+header h1{font-size:28px;margin:0 0 8px;letter-spacing:-.02em}
+.accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+header p{color:var(--muted);margin:0 0 26px;max-width:620px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px;margin-bottom:16px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+  margin:0 0 12px;font-weight:600}
+textarea{width:100%;min-height:130px;resize:vertical;background:var(--panel-2);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px 14px;
+  font:14px/1.65 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.2)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.spacer{flex:1}
+.count{color:var(--muted);font-size:12px}
+button{font:13px/1 inherit;border-radius:9px;padding:9px 14px;border:1px solid var(--border);
+  background:var(--panel-2);color:var(--text);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--accent);color:#fff}
+button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;
+  color:#fff;font-weight:600}
+button.primary:hover{box-shadow:0 6px 20px rgba(124,92,255,.38)}
+.preview{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:14px;
+  min-height:54px;white-space:pre-wrap;word-break:break-word;
+  font:14px/1.75 "JetBrains Mono",ui-monospace,monospace}
+.ph{color:var(--muted)}
+mark.hit{border-radius:4px;padding:1px 3px;color:#fff;cursor:help}
+mark.high{background:rgba(224,86,111,.32);box-shadow:inset 0 -2px 0 var(--crit)}
+mark.med{background:rgba(226,179,65,.26);box-shadow:inset 0 -2px 0 var(--warn)}
+.lvl{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.badge{font-weight:700;padding:3px 11px;border-radius:99px;font-size:13px}
+.meter{height:10px;border-radius:99px;background:var(--panel-2);overflow:hidden;border:1px solid var(--border)}
+.meter>i{display:block;height:100%;width:8%;border-radius:99px;transition:.3s}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--panel-2);border:1px solid var(--border);border-radius:99px;padding:4px 10px;font-size:12px}
+.hint{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.hint:last-child{border:none}
+.hint .from{color:var(--crit)}
+.hint .arrow{color:var(--muted)}
+.hint .to{color:var(--ok)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+  background:var(--accent);color:#fff;padding:10px 18px;border-radius:10px;opacity:0;
+  transition:.25s;pointer-events:none;font-size:13px;font-weight:600}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:560px){.wrap{padding:26px 14px 64px}header h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="accent">프롬프트 검사기</span></h1>
+    <p>프롬프트를 붙여넣으면 보컬찹·리듬 슬라이스·과한 글리치, 라이브 군중감을 부를 수 있는 단어를 실시간으로 표시하고, 안전한 대체 표현으로 바꿔줍니다.</p>
+  </header>
 
-      <section class="workspace" aria-label="프롬프트 검사 도구">
-        <div class="tool-column">
-          <div class="input-panel">
-            <div class="panel-title-row">
-              <div>
-                <p class="panel-kicker">Paste Prompt</p>
-                <h2>검사할 프롬프트</h2>
-              </div>
-              <span id="characterCount" class="count-pill">0자</span>
-            </div>
+  <section class="card">
+    <h2>검사할 프롬프트</h2>
+    <textarea id="input" placeholder="여기에 Suno 프롬프트를 붙여넣으세요…"></textarea>
+    <div class="row">
+      <span class="count" id="count">0자</span>
+      <span class="spacer"></span>
+      <button id="example">예시 넣기</button>
+      <button id="reset">초기화</button>
+      <button class="primary" id="hintcopy">힌트 복사</button>
+    </div>
+  </section>
 
-            <textarea
-              id="promptInput"
-              spellcheck="false"
-              placeholder="[Genre]&#10;Bright hopeful J-pop, acoustic pop rock...&#10;&#10;[Vocal]&#10;Clear expressive vocal, no vocal chops..."
-            ></textarea>
+  <section class="card">
+    <h2>위험도</h2>
+    <div class="lvl">
+      <span class="badge" id="lvlbadge">깔끔함</span>
+      <span class="count" id="detcount">감지 0개</span>
+    </div>
+    <div class="meter"><i id="meterfill"></i></div>
+    <p class="count" id="lvldesc" aria-live="polite" style="margin:10px 0 0">현재 목록 기준 위험 단어가 감지되지 않았습니다.</p>
+  </section>
 
-            <div class="button-row">
-              <button id="sampleButton" class="ghost-button" type="button">예시 넣기</button>
-              <button id="clearButton" class="ghost-button" type="button">초기화</button>
-              <button id="copyButton" class="primary-button" type="button">힌트 복사</button>
-            </div>
-          </div>
+  <section class="card">
+    <h2>위험 단어 하이라이트 · <span style="text-transform:none;font-weight:400">무조건 발생 아님, 확률 체크용</span></h2>
+    <div class="preview" id="preview"><span class="ph">검사할 프롬프트가 비어 있습니다.</span></div>
+    <div class="row"><span class="spacer"></span><span class="count">위험 단어에 마우스를 올리면 대체어가 보여요</span></div>
+  </section>
 
-          <section class="preview-panel" aria-labelledby="preview-title">
-            <div class="panel-title-row">
-              <div>
-                <p class="panel-kicker">Preview</p>
-                <h2 id="preview-title">위험 단어 하이라이트</h2>
-              </div>
-              <span class="note-pill">무조건 발생 아님, 확률 체크용</span>
-            </div>
-            <pre id="highlightPreview" class="highlight-preview"></pre>
-          </section>
+  <section class="card">
+    <h2>대체 단어로 바꾼 프롬프트</h2>
+    <div class="preview" id="rewrite"><span class="ph">대체할 단어가 없습니다.</span></div>
+    <div class="row"><span class="spacer"></span><button class="primary" id="rwcopy">수정본 복사</button></div>
+    <p class="count" style="margin:10px 0 0">대체 단어로 치환되더라도 패턴이 완전히 사라지는 것은 아닙니다. 확률을 줄이는 용도로만 봐주세요.</p>
+  </section>
 
-          <section class="rewrite-panel" aria-labelledby="rewrite-title">
-            <div class="panel-title-row">
-              <div>
-                <p class="panel-kicker">Rewrite</p>
-                <h2 id="rewrite-title">대체 단어로 바꾼 프롬프트</h2>
-              </div>
-              <button id="copyRewriteButton" class="primary-button small-button" type="button" disabled>
-                수정본 복사
-              </button>
-            </div>
-            <p class="rewrite-note">
-              대체 단어로 치환되더라도 해당 패턴이 완전히 사라지는 것은 아닙니다. 확률을 줄이는 용도로만 봐주세요.
-            </p>
-            <pre id="rewrittenPrompt" class="rewrite-preview"></pre>
-          </section>
-        </div>
+  <section class="card">
+    <h2>감지된 단어 <span id="chipcount" style="color:var(--muted);font-weight:400">0개</span></h2>
+    <div class="chips" id="chips"><span class="ph">없음</span></div>
+  </section>
 
-        <aside class="result-panel" aria-live="polite">
-          <div id="riskCard" class="risk-card clean">
-            <p class="panel-kicker">Risk Level</p>
-            <strong id="riskLabel">깔끔함</strong>
-            <span id="riskTone">현재 목록 기준으로는 위험 단어가 감지되지 않았습니다.</span>
-          </div>
+  <section class="card">
+    <h2>바꿔쓰기 힌트</h2>
+    <div id="hints"><span class="ph">감지된 단어가 없습니다.</span></div>
+  </section>
+</div>
+<div class="toast" id="toast">복사됨</div>
 
-          <div class="result-section">
-            <div class="panel-title-row compact">
-              <h2>감지된 단어</h2>
-              <span id="matchCount" class="count-pill">0개</span>
-            </div>
-            <div id="detectedList" class="detected-list"></div>
-          </div>
+<script>
+const DICT = [
+  {w:"kawaii future bass", s:"playful bright synth colors", lv:"high"},
+  {w:"melodic dubstep", s:"melodic electronic atmosphere", lv:"high"},
+  {w:"bubblegum bass", s:"playful bright synth colors", lv:"high"},
+  {w:"future bounce", s:"bright electronic pop texture", lv:"high"},
+  {w:"future bass", s:"bright electronic pop texture", lv:"high"},
+  {w:"hyperpop", s:"colorful modern pop energy", lv:"high"},
+  {w:"glitchcore", s:"crisp modern synth texture", lv:"high"},
+  {w:"glitch pop", s:"clean digital pop texture", lv:"high"},
+  {w:"glitch hop", s:"crisp electronic groove", lv:"high"},
+  {w:"glitch-hop", s:"crisp electronic groove", lv:"high"},
+  {w:"glitch_hop", s:"crisp electronic groove", lv:"high"},
+  {w:"nightcore", s:"bright fast pop energy", lv:"high"},
+  {w:"bitcrushed", s:"clean digital texture", lv:"med"},
+  {w:"chopped vocal", s:"natural continuous vocal line", lv:"high"},
+  {w:"sliced vocal", s:"natural continuous vocal line", lv:"high"},
+  {w:"glitched vocal", s:"clean lead vocal", lv:"high"},
+  {w:"glitch vocal", s:"clean lead vocal", lv:"high"},
+  {w:"pitched vocal", s:"natural-pitch vocal", lv:"high"},
+  {w:"high-pitched vocal", s:"natural-range vocal", lv:"med"},
+  {w:"granular vocal", s:"smooth vocal", lv:"med"},
+  {w:"formant-shifted vocal", s:"natural vocal", lv:"med"},
+  {w:"sampled vocal", s:"lead vocal melody", lv:"med"},
+  {w:"chiptune vocal", s:"clean synth lead", lv:"med"},
+  {w:"vocal chops", s:"sung melodic hook", lv:"high"},
+  {w:"vocal chop", s:"sung melodic hook", lv:"high"},
+  {w:"vocal sample", s:"lead vocal melody", lv:"high"},
+  {w:"vocal loop", s:"lead vocal melody", lv:"high"},
+  {w:"vocal drop", s:"sung chorus", lv:"high"},
+  {w:"beat slicing", s:"tight rhythmic groove", lv:"high"},
+  {w:"stutter edits", s:"smooth phrasing", lv:"high"},
+  {w:"rapid-fire edits", s:"smooth phrasing", lv:"med"},
+  {w:"machine-gun edits", s:"smooth phrasing", lv:"med"},
+  {w:"rapid edits", s:"smooth phrasing", lv:"med"},
+  {w:"micro edits", s:"smooth phrasing", lv:"med"},
+  {w:"cut-up", s:"continuous arrangement", lv:"med"},
+  {w:"drop-focused", s:"chorus-focused song structure", lv:"high"},
+  {w:"big drop", s:"sung chorus payoff", lv:"high"},
+  {w:"EDM drop", s:"melodic chorus", lv:"high"},
+  {w:"1/16", s:"steady rhythm", lv:"med"},
+  {w:"1/32", s:"steady rhythm", lv:"med"},
+  {w:"uplifting anthem", s:"bright hopeful J-pop", lv:"high"},
+  {w:"crowd vocals", s:"personal vocal-focused", lv:"high"},
+  {w:"crowd cheering", s:"studio performance", lv:"high"},
+  {w:"crowd clapping", s:"studio performance", lv:"high"},
+  {w:"crowd chant", s:"studio performance", lv:"high"},
+  {w:"audience cheering", s:"studio performance", lv:"high"},
+  {w:"gang vocals", s:"single lead vocal", lv:"high"},
+  {w:"pub singalong", s:"lead vocal melody", lv:"high"},
+  {w:"sing-along", s:"lead vocal melody", lv:"med"},
+  {w:"singalong", s:"lead vocal melody", lv:"med"},
+  {w:"live concert", s:"studio recording", lv:"high"},
+  {w:"live energy", s:"lively studio performance", lv:"med"},
+  {w:"arena reverb", s:"dry studio reverb", lv:"high"},
+  {w:"arena", s:"studio", lv:"med"},
+  {w:"stadium", s:"studio", lv:"med"},
+  {w:"audience", s:"studio", lv:"med"},
+  {w:"crowd", s:"studio", lv:"med"},
+  {w:"festival anthem", s:"adventurous folk color", lv:"high"},
+  {w:"festival", s:"adventurous folk color", lv:"med"},
+  {w:"anthemic", s:"melodic and uplifting", lv:"med"},
+  {w:"anthem", s:"melodic uplifting song", lv:"med"},
+  {w:"celebratory", s:"warm uplifting", lv:"med"},
+  {w:"triumphant", s:"confident", lv:"med"},
+  {w:"euphoric", s:"bright and hopeful", lv:"med"},
+  {w:"communal", s:"personal, vocal-focused", lv:"med"},
+  {w:"massive final chorus", s:"brighter final chorus", lv:"high"},
+  {w:"big final chorus", s:"brighter final chorus", lv:"med"},
+  {w:"massive chorus", s:"lifted melodic chorus", lv:"med"},
+  {w:"huge chorus", s:"lifted melodic chorus", lv:"med"},
+  {w:"soaring chorus", s:"lifted melodic chorus", lv:"med"},
+  {w:"explosive chorus", s:"strong studio chorus", lv:"high"},
+  {w:"wall of sound chorus", s:"clean separated chorus", lv:"high"},
+  {w:"wall of sound", s:"clean separated arrangement", lv:"med"},
+  {w:"emotional climax", s:"controlled emotional lift", lv:"med"},
+  {w:"bigger emotional lift", s:"controlled emotional lift", lv:"med"},
+  {w:"dopamine rush", s:"sparkling excitement", lv:"med"},
+  {w:"heart-racing", s:"nervous excitement", lv:"med"},
+  {w:"Celtic J-pop", s:"J-pop with Celtic fiddle motif", lv:"high"},
+  {w:"Irish folk energy", s:"dry Irish fiddle-style melody", lv:"med"},
+  {w:"traditional Irish folk", s:"dry Irish fiddle motif", lv:"med"},
+  {w:"folk festival", s:"adventurous folk color", lv:"med"},
+  {w:"Irish pub", s:"dry fiddle motif", lv:"med"}
+];
 
-          <div class="result-section">
-            <h2>바꿔쓰기 힌트</h2>
-            <div id="suggestionList" class="suggestion-list"></div>
-          </div>
-        </aside>
-      </section>
-    </main>
+const EXAMPLE = "Bright hopeful J-pop, uplifting anthem, future bass with vocal chops and a big drop, festival crowd singing along, hyperpop glitch vocal, massive final chorus, arena reverb, dopamine rush";
+const colorMap = {ok:"#4ec9a5", warn:"#e2b341", danger:"#e0795a", crit:"#e0566f"};
+const SORTED = [...DICT].sort((a,b)=>b.w.length-a.w.length);
+const $ = s => document.querySelector(s);
+const input=$("#input"), countEl=$("#count"), preview=$("#preview"),
+  rewriteEl=$("#rewrite"), chips=$("#chips"), chipcount=$("#chipcount"),
+  hintsEl=$("#hints"), lvlbadge=$("#lvlbadge"), lvldesc=$("#lvldesc"),
+  detcount=$("#detcount"), meterfill=$("#meterfill"), toast=$("#toast");
+let lastRewrite="";
 
-    <script type="module" src="./app.js"></script>
-  </body>
+const isWord = c => /[a-zA-Z0-9]/.test(c);
+function escapeHtml(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+
+function analyze(text){
+  const lower=text.toLowerCase();
+  const claimed=new Array(text.length).fill(false);
+  const hits=[];
+  for(const item of SORTED){
+    const wl=item.w.toLowerCase();
+    let from=0, idx;
+    while((idx=lower.indexOf(wl,from))!==-1){
+      const end=idx+wl.length;
+      const before=idx>0?text[idx-1]:" ";
+      const after=end<text.length?text[end]:" ";
+      let ok=true;
+      if(isWord(wl[0])&&isWord(before)) ok=false;
+      if(isWord(wl[wl.length-1])&&isWord(after)) ok=false;
+      for(let i=idx;i<end;i++){ if(claimed[i]){ok=false;break;} }
+      if(ok){ for(let i=idx;i<end;i++) claimed[i]=true;
+        hits.push({start:idx,end,item,text:text.slice(idx,end)}); }
+      from=idx+1;
+    }
+  }
+  return hits.sort((a,b)=>a.start-b.start);
+}
+
+function renderHighlight(text,hits){
+  let out="", pos=0;
+  for(const h of hits){
+    out+=escapeHtml(text.slice(pos,h.start));
+    out+=`<mark class="hit ${h.item.lv}" title="→ ${escapeHtml(h.item.s)}">${escapeHtml(h.text)}</mark>`;
+    pos=h.end;
+  }
+  out+=escapeHtml(text.slice(pos));
+  return out.replace(/\n/g,"<br>");
+}
+
+function rewrite(text,hits){
+  let out="", pos=0;
+  for(const h of hits){ out+=text.slice(pos,h.start)+h.item.s; pos=h.end; }
+  return out+text.slice(pos);
+}
+
+function riskLevel(hits){
+  const score=hits.reduce((a,h)=>a+(h.item.lv==="high"?2:1),0);
+  if(score===0) return {label:"깔끔함",cls:"ok",pct:8,desc:"현재 목록 기준 위험 단어가 감지되지 않았습니다."};
+  if(score<=2) return {label:"주의",cls:"warn",pct:35,desc:"가벼운 주의. 한두 단어만 바꿔도 충분합니다."};
+  if(score<=5) return {label:"위험",cls:"danger",pct:70,desc:"위험. 강한 단어를 빼고 안전 표현으로 바꾸길 권장합니다."};
+  return {label:"매우 위험",cls:"crit",pct:100,desc:"매우 위험. 장르 단어부터 안전 표현으로 교체하세요."};
+}
+
+function update(){
+  const t=input.value;
+  countEl.textContent=[...t].length+"자";
+  const hits=analyze(t);
+  preview.innerHTML = t ? renderHighlight(t,hits) : "<span class='ph'>검사할 프롬프트가 비어 있습니다.</span>";
+  lastRewrite = rewrite(t,hits);
+  rewriteEl.innerHTML = hits.length ? escapeHtml(lastRewrite).replace(/\n/g,"<br>")
+    : (t ? escapeHtml(t).replace(/\n/g,"<br>") : "<span class='ph'>대체할 단어가 없습니다.</span>");
+  const uniq=[...new Map(hits.map(h=>[h.text.toLowerCase(),h])).values()];
+  detcount.textContent="감지 "+hits.length+"개";
+  chipcount.textContent=uniq.length+"개";
+  chips.innerHTML = uniq.length ? uniq.map(h=>`<span class="chip">${escapeHtml(h.text)}</span>`).join("")
+    : "<span class='ph'>없음</span>";
+  hintsEl.innerHTML = uniq.length ? uniq.map(h=>`<div class="hint"><span class="from">${escapeHtml(h.text)}</span><span class="arrow">→</span><span class="to">${escapeHtml(h.item.s)}</span></div>`).join("")
+    : "<span class='ph'>감지된 단어가 없습니다.</span>";
+  const r=riskLevel(hits), c=colorMap[r.cls];
+  lvlbadge.textContent=r.label; lvldesc.textContent=r.desc;
+  lvlbadge.style.color=c; lvlbadge.style.background=c+"22";
+  meterfill.style.background=c; meterfill.style.width=r.pct+"%";
+}
+
+function showToast(msg){ toast.textContent=msg; toast.classList.add("show");
+  clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove("show"),1400); }
+function copy(text,msg){ navigator.clipboard.writeText(text).then(()=>showToast(msg||"복사됨")); }
+
+input.addEventListener("input",update);
+$("#example").addEventListener("click",()=>{ input.value=EXAMPLE; update(); input.focus(); });
+$("#reset").addEventListener("click",()=>{ input.value=""; update(); input.focus(); });
+$("#rwcopy").addEventListener("click",()=>{ if(lastRewrite) copy(lastRewrite,"수정본 복사됨"); });
+$("#hintcopy").addEventListener("click",()=>{
+  const hits=analyze(input.value);
+  const uniq=[...new Map(hits.map(h=>[h.text.toLowerCase(),h])).values()];
+  if(!uniq.length){ showToast("감지된 단어 없음"); return; }
+  copy(uniq.map(h=>`${h.text} → ${h.item.s}`).join("\n"),"힌트 복사됨");
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ input.value=""; update(); } });
+update();
+</script>
+</body>
 </html>
