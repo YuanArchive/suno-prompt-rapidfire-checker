@@ -6,8 +6,7 @@
     { "id": "rhythm", "label": "리듬 슬라이싱", "note": "인트로 등에서 잘게 끊기는 슬라이싱·스터터 패턴이 남을 수 있으니 인지하고 계세요." },
     { "id": "drop", "label": "드롭·빌드업", "note": "EDM식 드롭/빌드업 구조가 강조될 수 있어요." },
     { "id": "crowd", "label": "군중·찬트·콘서트홀 함성", "note": "함성·군중 효과는 곡의 음질을 심하게 떨어뜨릴 확률이 높습니다." },
-    { "id": "hype", "label": "과장된 고조·웅장한 코러스", "note": "톤이 갑자기 부풀거나 과장되게 고조될 수 있어요." },
-    { "id": "folk", "label": "켈틱·아이리시 포크 색채", "note": "켈틱/아이리시 포크 색채가 강하게 들어올 수 있어요." }
+    { "id": "hype", "label": "과장된 고조·웅장한 코러스", "note": "톤이 갑자기 부풀거나 과장되게 고조될 수 있어요." }
   ],
   "words": [
     { "w": "kawaii future bass", "s": "playful bright synth colors", "lv": "high", "cat": "glitch" },
@@ -67,8 +66,8 @@
     { "w": "stadium", "s": "studio", "lv": "med", "cat": "crowd" },
     { "w": "audience", "s": "studio", "lv": "med", "cat": "crowd" },
     { "w": "crowd", "s": "studio", "lv": "med", "cat": "crowd" },
-    { "w": "festival anthem", "s": "adventurous folk color", "lv": "high", "cat": "crowd" },
-    { "w": "festival", "s": "adventurous folk color", "lv": "med", "cat": "crowd" },
+    { "w": "festival anthem", "s": "bright adventurous energy", "lv": "high", "cat": "crowd" },
+    { "w": "festival", "s": "bright adventurous energy", "lv": "med", "cat": "crowd" },
     { "w": "anthemic", "s": "melodic and uplifting", "lv": "med", "cat": "hype" },
     { "w": "anthem", "s": "melodic uplifting song", "lv": "med", "cat": "hype" },
     { "w": "celebratory", "s": "warm uplifting", "lv": "med", "cat": "hype" },
@@ -87,11 +86,6 @@
     { "w": "bigger emotional lift", "s": "controlled emotional lift", "lv": "med", "cat": "hype" },
     { "w": "dopamine rush", "s": "sparkling excitement", "lv": "med", "cat": "hype" },
     { "w": "heart-racing", "s": "nervous excitement", "lv": "med", "cat": "hype" },
-    { "w": "Celtic J-pop", "s": "J-pop with Celtic fiddle motif", "lv": "high", "cat": "folk" },
-    { "w": "Irish folk energy", "s": "dry Irish fiddle-style melody", "lv": "med", "cat": "folk" },
-    { "w": "traditional Irish folk", "s": "dry Irish fiddle motif", "lv": "med", "cat": "folk" },
-    { "w": "folk festival", "s": "adventurous folk color", "lv": "med", "cat": "folk" },
-    { "w": "Irish pub", "s": "dry fiddle motif", "lv": "med", "cat": "folk" },
     { "w": "doubling", "s": "single clear lead vocal", "lv": "high", "cat": "doubling" },
     { "w": "vocal doubling", "s": "single clear lead vocal", "lv": "high", "cat": "doubling" },
     { "w": "double vocal", "s": "single clear lead vocal", "lv": "high", "cat": "doubling" },
